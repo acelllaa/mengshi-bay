@@ -460,7 +460,8 @@ S.load = function(){
     S.img[a.key] = im;
   }
 };
-S.src = k => { k = S.alias(k); return S.has(k) ? S.img[k].src : null; };
+// v3.1.1：DOM 界面只需要 URL，不必等解码完成（单文件版 data URI 解码是异步的，旧写法导致 UI.skin 首次调用时拿不到图）
+S.src = k => { k = S.alias(k); const i = S.img[k]; return i && i.src && !(i.complete && !i.naturalWidth && !i.src.startsWith('data:')) ? i.src : null; };
 S.has = k => { const i = S.img[S.alias(k)]; return !!(i && i.complete && i.naturalWidth); };
 // draw a key; anim: base key without _n, frame index chosen by t*fps
 S.frameKey = function(base, t, fps, n){ base = S.alias(base); let c=0; while(S.meta[base+'_'+c]) c++; if(!c) return null; return base+'_'+(Math.floor(t*fps)%c); };
